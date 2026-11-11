@@ -4,3 +4,5 @@
 .Ruserdata
 .Rproj
 .posit/assistant
+build/mod/
+x64/k2_h1d.exe
