@@ -119,6 +119,12 @@ C                                                               local variables
 C------------------------------------------------------------------------------
 
       logical :: up, unif, laminar
+C                                    coupled-mode (H1D-K2) hooks, see below
+      logical, save :: coupled = .false., ext_inf = .false.
+      logical :: ex_st
+      real, save :: fav_ext(20)
+      integer :: iu, nkf
+      real :: hmean
 
       integer :: nd, ierr, nk, j, jp1, ms, upq, outq(2), i, k, idup,
      &           inflow(12), nu, upr, outr, ngage, nzro=0
@@ -737,6 +743,34 @@ C                                                                    Q=0 at t=0
       unif = .true.
       nc = 1
       sumrf = 0.
+C                                    optional coupled-mode input files.
+C                                    absent => stock behaviour (no change)
+      inquire (file = 'k2_infil.in', exist = ext_inf)
+      coupled = ext_inf
+      if (ext_inf) then
+C                       k2_infil.in: nk, then fav(1:nk) (m/s, constant/run)
+        open (newunit = iu, file = 'k2_infil.in', status = 'old')
+        read (iu, *) nkf
+        if (nkf .ne. nk) call errxit (msg(ms:14),
+     &                    'k2_infil.in node count mismatch')
+        read (iu, *) (fav_ext(j), j = 1, nk)
+        close (iu)
+      end if
+      inquire (file = 'k2_state.in', exist = ex_st)
+      if (ex_st) then
+C                       k2_state.in: nk, then h, q, topw, xc per node
+        open (newunit = iu, file = 'k2_state.in', status = 'old')
+        read (iu, *) nkf
+        if (nkf .ne. nk) call errxit (msg(ms:14),
+     &                    'k2_state.in node count mismatch')
+        do j = 1, nk
+          read (iu, *) h1(j), q1(j), topw(j), xc(j)
+          h2(j) = h1(j)
+          q2(j) = q1(j)
+          if (h1(j) .gt. 0.) unif = .false.
+        end do
+        close (iu)
+      end if
 
       p1 = limit / 4
       p2 = limit / 2
@@ -916,7 +950,13 @@ C!!                               afac returns to represent coeff. for qlat
 C!!    replace dt with dtp/ 2/18/03
 
 
-        call infilt(afac, rf, h1avg, ql, dtp, fav, 1)
+        if (ext_inf) then
+          do j = 2, nk
+            fav(j) = fav_ext(j)
+          end do
+        else
+          call infilt(afac, rf, h1avg, ql, dtp, fav, 1)
+        end if
 
 C        write(33,'(3F10.6,2X,L1)')
 C     &  rf*1000.*3600., fav(nk)*1000.*3600., h1avg(nk)*1000., unif
@@ -1316,7 +1356,8 @@ C        WRITE( 8, '(F10.2,",",F10.2)' ) (step-delt)/60., dvf_delt
 C After rainfall and upstream inflow cease, stop simulating when no water
 C remains on the surface
 
-        if(time .gt. t_min .and. hsum .eq. 0.) go to 100
+        if(time .gt. t_min .and. hsum .eq. 0. .and.
+     &     .not. coupled) go to 100
 
 !TEMP 21AUG2013
 !        Hav(iplane,i) = hsum / REAL( nk - 1 )
@@ -1381,6 +1422,27 @@ C                                                                storage volume
 C                                                            infiltrated volume
       qbal(6) = max (qbal(6) * width * dx, 0.)
 C                                                         pass values to writer
+
+C                                    coupled mode: dump end-of-run state
+C                                    and period totals (volumes in m3)
+      if (coupled) then
+        open (newunit = iu, file = 'k2_state.out', status = 'replace')
+        write (iu, '(i4)') nk
+        do j = 1, nk
+          write (iu, '(4es18.9)') h2(j), q2(j), topw(j), xc(j)
+        end do
+        close (iu)
+        hmean = 0.
+        do j = 2, nk
+          hmean = hmean + h2(j)
+        end do
+        hmean = hmean / float (nk - 1)
+        open (newunit = iu, file = 'k2_period.out', status = 'replace')
+        write (iu, '(a)') 'rain_vol infil_vol stor_vol out_vol hmean out_q'
+        write (iu, '(6es18.9)') qbal(2), qbal(6), qbal(9), qbal(10),
+     &                           hmean, width * q2(nk)
+        close (iu)
+      end if
 
       call qwrt (id, 1, msg, qpw, tp, vin, coarea, outq, 0, outr, qrmax)
 

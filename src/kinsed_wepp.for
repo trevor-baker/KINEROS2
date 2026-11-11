@@ -152,7 +152,7 @@ C
       
 C
       character(LEN=2),dimension(5) :: attr = reshape((/'S1', 'S2', 
-     &'S3', 'S4', 'S5'/),(/5,1/))
+     &'S3', 'S4', 'S5'/),(/5/))
 
       character ka_str*1
 
