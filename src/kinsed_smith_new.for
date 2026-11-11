@@ -119,6 +119,7 @@ C------------------------------------------------------------------------------
 
       subroutine kinsed_smith (indx, dt, dte, ql, a2, q2,
      &                         topw, rf, qup, qt, time)
+      use k2dims
 
       use runpars
       use elpars
@@ -130,10 +131,10 @@ C------------------------------------------------------------------------------
 
 C      dimension inflow(12), ql(30,k), a2(30,k), q2(30,k), topw(30,k),
 C     &          qup(10,2), wid(30,k), slp(30,k), qt(30), norder(5)! dp(5), rh(5),vs(5)
-      real, dimension(20) :: qt
+      real, dimension(maxnk) :: qt
 C      real, dimension(30,nchan) ::  a2, q2, topw, wid, slp
-      real, dimension(20,nchan) ::  a2, q2, topw, slp
-      real, dimension(20,2) :: ql
+      real, dimension(maxnk,nchan) ::  a2, q2, topw, slp
+      real, dimension(maxnk,2) :: ql
       real, dimension(10,2) :: qup
       integer, dimension(12) :: inflow
 
@@ -155,11 +156,11 @@ C
       real,save,dimension(5) :: wso, dwso, dwsol, wsin, dwsup, dwsupl
       real,save,dimension(5,2) :: csub, pros, sd, csub1, csub2, dcsub,
      &                       qcsl1, qcsl2, dqcsl, qcsl, qcslm
-      real,save,dimension(20,2) :: depnet, slope, qilm, a1, q1, qil,
+      real,save,dimension(maxnk,2) :: depnet, slope, qilm, a1, q1, qil,
      &                        qll !, width
-      real,save,dimension(5,20,2) :: cs, cl, cml, deprt, supl, cm
+      real,save,dimension(5,maxnk,2) :: cs, cl, cml, deprt, supl, cm
 
-      real conc(20)
+      real conc(maxnk)
 C
       integer, save, dimension(2) :: nlp
       integer, save, dimension(5,2) :: outc, latc

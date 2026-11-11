@@ -63,6 +63,7 @@
 !-------------------------------------------------------------------------------
 
       subroutine pipe()
+      use k2dims
 C
       use runpars
       use elpars
@@ -75,18 +76,18 @@ C
       character(LEN=6) :: source = 'pipe  '  
 C** 22/4/03  units character
       character(LEN=2) :: chl
-      dimension ql(20,2),  a2(20), q2(20), idup(10),!, q1(20) a1(20),
-     &          upr(10), upq(10,2), inflow(12), slp(20), topw(20),
-     &          qt(20), qup(10,2)
+      dimension ql(maxnk,2),  a2(maxnk), q2(maxnk), idup(10),!, q1(maxnk) a1(maxnk),
+     &          upr(10), upq(10,2), inflow(12), slp(maxnk), topw(maxnk),
+     &          qt(maxnk), qup(10,2)
 
       external erthub, errth2
 
       data pi, twopi /3.1415927, 6.2831853/
 !                                                                common data
 !-------------------------------------------------------------------------------
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &               j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &               qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &               j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &               qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 C
       omega = 0.8
 !                                                           get input parameters
@@ -585,14 +586,15 @@ C  recompute with new subinterval
 !-------------------------------------------------------------------------------
 
       subroutine erthub(thub, ferr, dferr)
+      use k2dims
 
 ! Computes the residual and derivative at angle thub of the error function
 ! form of the discharge equation for circular pipe flow with a free surface
 ! condition:
 
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
       ferr = q_f(thub) - qub
       dferr = dqdth_f(thub)
@@ -603,14 +605,15 @@ C  recompute with new subinterval
 !-------------------------------------------------------------------------------
 
       subroutine errth2(th2jp1, ferr, dferr)
+      use k2dims
 
 ! Computes the residual and derivative at angle th2jp1 of the error function
 ! form of the kinematic equation for circular pipe flow with a free surface
 ! condition
 
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
 C
       if (th2jp1 .le. thz) then
@@ -642,10 +645,11 @@ C      write(99,101) term2, term3, term4, dadth2, deriv, dqdth2, d2qdtx
 !-------------------------------------------------------------------------------
 
       function area_f(theta) ! Cross sectional area
+      use k2dims
 
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
       if(theta .gt. thz) then
         if(theta .lt. 0.01) then
@@ -663,10 +667,11 @@ C      write(99,101) term2, term3, term4, dadth2, deriv, dqdth2, d2qdtx
 !----------------------------------------------------------------------------
 
       function dadth(theta)
+      use k2dims
 C
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
       if(theta .gt. thz) then
         if(theta .gt. .01) then
@@ -684,10 +689,11 @@ C
 !----------------------------------------------------------------------------
 
       function wpm_f(theta)    ! Wetted perimeter
+      use k2dims
 
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
       if(theta .ge. thz) then
         wpm_f = diam * theta/2.
@@ -701,10 +707,11 @@ C
 !-------------------------------------------------------------------------------
 
       function topw_f(theta) ! Top width
+      use k2dims
 
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
       topw_f = amax1(diam * sin (theta/2.), 0.01)
 
@@ -714,10 +721,11 @@ C
 !-------------------------------------------------------------------------------
 
       function q_f(theta)    ! Discharge
+      use k2dims
 
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
       afu = area_f(theta)
       if(afu .gt. 0.) then
@@ -732,10 +740,11 @@ C
 !-------------------------------------------------------------------------------
 
       function dqdth_f(theta) ! Derivative of discharge w/resp to angle theta
+      use k2dims
 
-      common /pipe1/ th1(20), th2(20), qub, diamsq, diam, alpha, power,
-     &              j, jp1, dt, dx, omega, ar1(20), ar2(20),
-     &              qr1(20), qr2(20), thz, az, daz, dqz
+      common /pipe1/ th1(maxnk), th2(maxnk), qub, diamsq, diam, alpha, power,
+     &              j, jp1, dt, dx, omega, ar1(maxnk), ar2(maxnk),
+     &              qr1(maxnk), qr2(maxnk), thz, az, daz, dqz
 
       area = area_f(theta)
 

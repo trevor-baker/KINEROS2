@@ -100,6 +100,7 @@ C------------------------------------------------------------------------------
 
       subroutine kinsed_rhem ( indx, dt, dte, ql, a2, q2, rf, 
      &                 	qup, time )
+      use k2dims
 
       use runpars
       use elpars
@@ -109,20 +110,20 @@ C------------------------------------------------------------------------------
 
       integer  indx, nx, nc
       real dt, dte, rf, time, delx
-      real, dimension(30) ::  a2, q2, slp
-      real, dimension(30) ::  ql, sumq2
+      real, dimension(maxnk) ::  a2, q2, slp
+      real, dimension(maxnk) ::  ql, sumq2
       real, dimension(10) :: qup
       integer, dimension(10) :: inflow
 
       character msg*(*)
 
-      real, dimension(30) :: qso
+      real, dimension(maxnk) :: qso
 C                                                               local variables
 C------------------------------------------------------------------------------
 C  qr2- discharge in a rill 
 C  ar2- x-sectional area of flow in a rill 
 C  h2 - depth of flow at given time and given node    
-      real, dimension(30) :: qr2, ar2, h2, eros, velocity, width
+      real, dimension(maxnk) :: qr2, ar2, h2, eros, velocity, width
       integer :: ierr, i, im, j, jp, n, na, nup, nlat, redist
       integer, dimension(5):: excd
       integer,save :: nk, ilast, nu
@@ -136,12 +137,12 @@ C
      &              Kibadj, Ki, alpha, p 
       real,save,dimension(5) :: wso, dwso, dwsol, wsin, dwsup, dwsupl
       real,save,dimension(5) :: csub, pros, csub1, csub2, dcsub
-      real,save,dimension(30) :: depnet, slope, a1, q1, qil, Fr, prob
-      real,save,dimension(30) :: depnet_neg, depnet_pos
-      real,save,dimension(5,30) :: cs, cl 
-      real,save,dimension(30):: cst, clt, erosp, widthp
+      real,save,dimension(maxnk) :: depnet, slope, a1, q1, qil, Fr, prob
+      real,save,dimension(maxnk) :: depnet_neg, depnet_pos
+      real,save,dimension(5,maxnk) :: cs, cl 
+      real,save,dimension(maxnk):: cst, clt, erosp, widthp
 	real cpt, cpmt
-	real,save,dimension(30) ::qr1, ar1, h1
+	real,save,dimension(maxnk) ::qr1, ar1, h1
       real, dimension(5):: cp, cpm, qsi
 C
       integer, save, dimension(5) :: outc

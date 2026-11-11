@@ -99,6 +99,7 @@ C------------------------------------------------------------------------------
 
 
       subroutine plane (t, z, nd, sat)
+      use k2dims
 
       use runpars
       use elpars
@@ -121,8 +122,8 @@ C------------------------------------------------------------------------------
       logical :: up, unif, laminar
 C                                    coupled-mode (H1D-K2) hooks, see below
       logical, save :: coupled = .false., ext_inf = .false.
-      logical :: ex_st
-      real, save :: fav_ext(20)
+      logical :: ex_st, ex_nk
+      real, save :: fav_ext(maxnk)
       integer :: iu, nkf
       real :: hmean
 
@@ -134,20 +135,20 @@ C                                    coupled-mode (H1D-K2) hooks, see below
 C** new units character  22/4/03
       character(LEN=2) :: chl
 
-      common /plane1/ dt, dx, j, jp1, qlav, alpha(20), p(20), h1(20), 
-     &                h2(20), q1(20), q2(20), h2c, ams, wpc, c1, c2, bw,
-     &                qb, omega, alam(20), aturb(20), htrans(20), plam,
+      common /plane1/ dt, dx, j, jp1, qlav, alpha(maxnk), p(maxnk), h1(maxnk), 
+     &                h2(maxnk), q1(maxnk), q2(maxnk), h2c, ams, wpc, c1, c2, bw,
+     &                qb, omega, alam(maxnk), aturb(maxnk), htrans(maxnk), plam,
      &                pturb, laminar
 C
       real,dimension(10,2) :: qup
-      real,dimension(20,2) :: ql
-      real,dimension(20) ::  topw, slp, fav, qt, afac, h1avg, xc, qz
+      real,dimension(maxnk,2) :: ql
+      real,dimension(maxnk) ::  topw, slp, fav, qt, afac, h1avg, xc, qz
       real,dimension(5000) :: t, z, r, zn
       real, parameter :: dtmin = 0.
       real, parameter :: zro = 0.
       real :: qtrans
 C                                               slopes and horizontal distances
-      real,dimension(20)   :: slope, dist
+      real,dimension(maxnk)   :: slope, dist
       integer              :: npairs
 
 C**      INTEGER            :: fagl_delay =  900 ! milliseconds, must be < 1000
@@ -166,8 +167,8 @@ C------------------------------------------------------------------------------
 
       external erpaub
 
-      data topw /20*1./
-      data qt /20*0./
+      data topw /maxnk*1./
+      data qt /maxnk*0./
       data qup /20*0./
       
       omega = 0.8        !  0.8 to match chan
@@ -222,6 +223,20 @@ C                                                                        LENGTH
       nk = max1 ((15. * xleng / clen), 5.)
 C                                                       number of spatial nodes
       if (nk .gt. 15) nk = 15
+C                      opt-in (coupled mode): k2_infil.in line 1 sets nk, up to maxnk
+      inquire (file = 'k2_infil.in', exist = ex_nk)
+      if (ex_nk) then
+        open (newunit = iu, file = 'k2_infil.in', status = 'old')
+        read (iu, *, iostat = ierr) nkf
+        close (iu)
+        if (ierr .ne. 0) call errxit (msg(ms:14),
+     &                    'cannot read node count from k2_infil.in')
+        if (nkf .lt. 5 .or. nkf .gt. maxnk) then
+          call errxit (msg(ms:14), 'k2_infil.in node count must be 5 to'
+     &                 //' maxnk (41)')
+        end if
+        nk = nkf
+      end if
 C                                                            distance increment
       dx = xleng / (float(nk) - 1.)
 
@@ -320,7 +335,7 @@ C                                                                         SLOPE
       dist(1) = 0.
       npairs = 1
 
-      do i = 2, 20
+      do i = 2, maxnk
         np1 = npairs + 1
         call getr4 ('SL', np1, slope(np1), ierr)
         if (ierr .gt. 0) go to 2
@@ -1453,15 +1468,16 @@ C                                    and period totals (volumes in m3)
 C------------------------------------------------------------------------------
 
       subroutine errh2 (h2jp1, ferr, dferr)
+      use k2dims
 
 C   Computes the residual ferr and derivative dferr at h2jp1 of the error
 C   function form of the finite difference approximation of the kinematic
 C   equation for flow on a sloping plane.  Includes microtopog. geometry
 
       logical laminar
-      common /plane1/ dt, dx, j, jp1, qlav, alpha(20), p(20), h1(20), 
-     &                h2(20), q1(20), q2(20), h2c, ams, wpc, c1, c2, bw,
-     &                qb, omega, alam(20), aturb(20), htrans(20), plam,
+      common /plane1/ dt, dx, j, jp1, qlav, alpha(maxnk), p(maxnk), h1(maxnk), 
+     &                h2(maxnk), q1(maxnk), q2(maxnk), h2c, ams, wpc, c1, c2, bw,
+     &                qb, omega, alam(maxnk), aturb(maxnk), htrans(maxnk), plam,
      &                pturb, laminar
 
       dhdt = .5 * (h2jp1 - h1(jp1) + h2(j) - h1(j)) / dt
@@ -1500,15 +1516,16 @@ C   equation for flow on a sloping plane.  Includes microtopog. geometry
 C------------------------------------------------------------------------------
 
       subroutine erpaub (aub, ferr, dferr)
+      use k2dims
 
 C   Computes the residual and derivative of the normal discharge function
 C   to obtain the upstream area for a given upstream flow for trapezoidal
 C   microtopography
 
       logical laminar
-      common /plane1/ dt, dx, j, jp1, qlav, alpha(20), p(20), h1(20), 
-     &                h2(20), q1(20), q2(20), h2c, ams, wpc, c1, c2, bw,
-     &                qb, omega, alam(20), aturb(20), htrans(20), plam,
+      common /plane1/ dt, dx, j, jp1, qlav, alpha(maxnk), p(maxnk), h1(maxnk), 
+     &                h2(maxnk), q1(maxnk), q2(maxnk), h2c, ams, wpc, c1, c2, bw,
+     &                qb, omega, alam(maxnk), aturb(maxnk), htrans(maxnk), plam,
      &                pturb, laminar
 
       ferr  = qfunc(alpha(1), aub, bw, p(1), c1, c2) - qb

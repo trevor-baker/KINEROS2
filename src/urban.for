@@ -124,6 +124,7 @@ C     errxit        (K2RunW.for)
 C------------------------------------------------------------------------------
 
       subroutine urban (t, z, nd, sat)
+      use k2dims
 
       use multip
       use runpars
@@ -148,14 +149,14 @@ C** 4/03  0. = zro
       real :: zro = 0.
       real, dimension(5) :: wso = (/0.,0.,0.,0.,0./)
 
-      dimension t(5000), r(5000), z(5000), upq(10), slope(2),fav(20),
-     &          upr(10), idup(10), fract(6), alph(3), ql(20), afac(20),
-     &          h_avg(20), q_sup(20)  !4/03 remove wso(5), outc(5,2) attr here
+      dimension t(5000), r(5000), z(5000), upq(10), slope(2),fav(maxnk),
+     &          upr(10), idup(10), fract(6), alph(3), ql(maxnk), afac(maxnk),
+     &          h_avg(maxnk), q_sup(maxnk)  !4/03 remove wso(5), outc(5,2) attr here
 
 C                                                                   common data
 
-      common /vars/ a1(20), a2(20), q1(20), q2(20), wpr1(20), wpr2(20),
-     &              co1, co2, h1(20), h2(20), j, jp1, omega, qub, dt,
+      common /vars/ a1(maxnk), a2(maxnk), q1(maxnk), q2(maxnk), wpr1(maxnk), wpr2(maxnk),
+     &              co1, co2, h1(maxnk), h2(maxnk), j, jp1, omega, qub, dt,
      &              dx, alpha, p, rfi, qlav
 
 
@@ -1226,6 +1227,7 @@ C**  this is a dummy call to put in zeros
 C------------------------------------------------------------------------------
 
       subroutine errpl (h2jp1, ferr, dferr)
+      use k2dims
 
 C   Computes the residual ferr and derivative dferr at h2jp1 of the error
 C   function form of the finite difference approximation of the kinematic
@@ -1233,8 +1235,8 @@ C   equation for flow on a sloping plane.
 
       integer j, jp1
 C      character(LEN=6) :: trace
-      common /vars/ a1(20), a2(20), q1(20), q2(20), wpr1(20), wpr2(20),
-     &              co1, co2, h1(20), h2(20), j, jp1, omega, qub, dt,
+      common /vars/ a1(maxnk), a2(maxnk), q1(maxnk), q2(maxnk), wpr1(maxnk), wpr2(maxnk),
+     &              co1, co2, h1(maxnk), h2(maxnk), j, jp1, omega, qub, dt,
      &              dx, alpha, p, rfi, qlav
 
 
@@ -1257,14 +1259,15 @@ C
 C------------------------------------------------------------------------------
 
       subroutine errsub (hub, ferr, dferr)
+      use k2dims
 
 C  Computes the residual and derivative w/resp to h at hub in a uniform
 C  discharge equation for the street half.
 
       integer j, jp1
 
-      common /vars/ a1(20), a2(20), q1(20), q2(20), wpr1(20), wpr2(20),
-     &              co1, co2, h1(20), h2(20), j, jp1, omega, qub, dt,
+      common /vars/ a1(maxnk), a2(maxnk), q1(maxnk), q2(maxnk), wpr1(maxnk), wpr2(maxnk),
+     &              co1, co2, h1(maxnk), h2(maxnk), j, jp1, omega, qub, dt,
      &              dx, alpha, p, rfi, qlav
 
       a2(1) = afunct (hub,  co1)
@@ -1282,14 +1285,15 @@ C  discharge equation for the street half.
 C------------------------------------------------------------------------------
 
       subroutine errst (h2jp1, ferr, dferr)
+      use k2dims
 
 C  Computes the residual and derivative w/resp to h at h2jp1 in a finite
 C  difference kinematic flow equation for the street half.
 
       integer j, jp1
 
-      common /vars/ a1(20), a2(20), q1(20), q2(20), wpr1(20), wpr2(20),
-     &              co1, co2, h1(20), h2(20), j, jp1, omega, qub, dt,
+      common /vars/ a1(maxnk), a2(maxnk), q1(maxnk), q2(maxnk), wpr1(maxnk), wpr2(maxnk),
+     &              co1, co2, h1(maxnk), h2(maxnk), j, jp1, omega, qub, dt,
      &              dx, alpha, p, rfi, qlav
 
       a2(jp1) = afunct (h2jp1, co1)
@@ -1310,14 +1314,15 @@ C  difference kinematic flow equation for the street half.
 C------------------------------------------------------------------------------
 
       subroutine errsza (hza, ferr, dferr)
+      use k2dims
 
 C  Computes the residual and derivative w/resp to h at hza in an eqn for flow
 C  in zone A of the solution space (street half, no upstream inflow).
 
       integer j, jp1
 
-      common /vars/ a1(20), a2(20), q1(20), q2(20), wpr1(20), wpr2(20),
-     &              co1, co2, h1(20), h2(20), j, jp1, omega, qub, dt,
+      common /vars/ a1(maxnk), a2(maxnk), q1(maxnk), q2(maxnk), wpr1(maxnk), wpr2(maxnk),
+     &              co1, co2, h1(maxnk), h2(maxnk), j, jp1, omega, qub, dt,
      &              dx, alpha, p, rfi, qlav
 
       a2(j) = afunct (hza, co1)

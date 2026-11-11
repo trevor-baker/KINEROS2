@@ -157,6 +157,7 @@ C     topfil   logical .T. when upper layer is saturated.
 C------------------------------------------------------------------------------
 
       subroutine infilt ( afac, rfi, h1, qu, dtt, vav, ichan )
+      use k2dims
 
       use multip          ! this module for LaheyF version only
       use itpars
@@ -172,8 +173,8 @@ C------------------------------------------------------------------------------
 
       integer ::  nx, ichan   !, k
 
-      real,dimension(20) :: afac
-      real,dimension(20,nchan) :: h1, vav, qu
+      real,dimension(maxnk) :: afac
+      real,dimension(maxnk,nchan) :: h1, vav, qu
 C                                                               local variables
 C------------------------------------------------------------------------------
 C
@@ -182,16 +183,16 @@ C
       character(LEN=20) :: calldat
       character*14 notice
 
-      real  :: sumfs, sumv(20)
+      real  :: sumfs, sumv(maxnk)
 
-      logical :: twolay, ifl, topfil(20,2), subcon(2), lowet(20,2)
+      logical :: twolay, ifl, topfil(maxnk,2), subcon(2), lowet(maxnk,2)
      &, notify(2), dbg  !
 
       integer :: ierr, nk, i, j, niter, idu(2)
 
-      dimension fs(20,2), fv(20,2), thiu(20,2), tho(20,2), fr(20,2),
-     &          fi(20,2), fkp(20,2), qki(20,2), fcr(20,2), zp(20,2),
-     &          zb(20,2), gu(2), cumcm(2), thin(2), ziu(20), t(2),
+      dimension fs(maxnk,2), fv(maxnk,2), thiu(maxnk,2), tho(maxnk,2), fr(maxnk,2),
+     &          fi(maxnk,2), fkp(maxnk,2), qki(maxnk,2), fcr(maxnk,2), zp(maxnk,2),
+     &          zb(maxnk,2), gu(2), cumcm(2), thin(2), ziu(maxnk), t(2),
      &          def1(2), def2(2), por1(2), por2(2)
 
       common /infil/ twolay(2), zfl(2), f2l, vmu, sk1(2), sk2(2), g1(2),
@@ -200,7 +201,7 @@ C
      &      pb2(2), eps1(2), eps2(2), erfi(2), dtu, trp, i, dbg, intyp
 
       common /layr/ g2u(2), thm1(2), thm2(2), thi2, rc(2), vmin2(2),
-     &              ref, wcf(2), ffl(20,2), sku(20), cv(2), fil, idl, j
+     &              ref, wcf(2), ffl(maxnk,2), sku(maxnk), cv(2), fil, idl, j
 
 C------------------------------------------------------------------------------
 
@@ -1599,6 +1600,7 @@ C   Computes saturation in SURFACE soil to match head in SUBsoil
 C------------------------------------------------------------------------------
 
       subroutine errvf ( F2n, ferr, dferr)
+      use k2dims
 
       implicit double precision (a-h, o-z)
 
@@ -1616,7 +1618,7 @@ C
      &      pb2(2), eps1(2), eps2(2), erfi(2), dtu, trp, i, dbg, intyp
 
       common /layr/ g2u(2), thm1(2), thm2(2), thi2, rc(2), vmin2(2),
-     &              ref, wcf(2), ffl(20,2), sku(20), cv(2), fil, idl, j
+     &              ref, wcf(2), ffl(maxnk,2), sku(maxnk), cv(2), fil, idl, j
 
       logical :: twolay, ifn, dbg
 
@@ -2162,6 +2164,7 @@ C   Assumes head and entry head P are both positive.
 C------------------------------------------------------------------------------
 
       subroutine setg (thi, zb, fv, ht, gef, k, sk, set)
+      use k2dims
 
 C   Sets appropriate values of G and AP depending on location
 C   of wetting front, for 1 or 2 soil layers
@@ -2174,7 +2177,7 @@ C   of wetting front, for 1 or 2 soil layers
      &      pb2(2), eps1(2), eps2(2), erfi(2), dtu, trp, i, dbg, intyp
 
       common /layr/ g2u(2), thm1(2), thm2(2), thi2, rc(2), vmin2(2),
-     &              ref, wcf(2), ffl(20,2), sku(20), cv(2), fil, idl, j
+     &              ref, wcf(2), ffl(maxnk,2), sku(maxnk), cv(2), fil, idl, j
 
       logical :: twolay, op, dbg
       character*6 trace, set*2
@@ -2534,6 +2537,7 @@ C
 C------------------------------------------------------------------------------
 
       subroutine fcapv (Icode, Ic, fu, ifl, dfdi)
+      use k2dims
 
 C   Finds infiltrability fu(Ic) for randomly heterogeneous area, and for
 C   flag IFL true, finds derivative w/r cumulative infilt Ic
@@ -2558,7 +2562,7 @@ C     dfdi   derivative of fv w/r ic
      &      pb2(2), eps1(2), eps2(2), erfi(2), dtu, trp, i, dbg, intyp
 
       common /layr/ g2u(2), thm1(2), thm2(2), thi2, rc(2), vmin2(2),
-     &              ref, wcf(2), ffl(20,2), sku(20), cv(2), fil, idl, j
+     &              ref, wcf(2), ffl(maxnk,2), sku(maxnk), cv(2), fil, idl, j
 
       logical :: twolay, ifl, dbg
 

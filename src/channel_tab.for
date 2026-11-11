@@ -155,6 +155,7 @@ C     errxit        (errxit.for)
 C------------------------------------------------------------------------------
 
       subroutine channl (t, z, nd, sat)
+      use k2dims
 
       use runpars        ! global parameters
       use elpars
@@ -181,14 +182,14 @@ C** new chl
       character(LEN=1) :: chl
       real :: zeron=0. , vone = 1.0                                          ! 10/02
 
-      common /chan/ a1(20,2), a2(20,2), q1(20,2), q2(20,2), fav(20,2),
-     &              wpr1(20,2), wpr2(20,2), co1(20,2), co2(20,2),
-     &              co1a(20), co2a(20), h1(20,2), h2(20), ewpr1(20,2),
-     &              ewpr2(20,2), a0(20), wpr0(20), tw0(20), hb(20),
-     &              ahb(20), wprhb(20), twhb(20), co1hb(20), co2hb(20),
+      common /chan/ a1(maxnk,2), a2(maxnk,2), q1(maxnk,2), q2(maxnk,2), fav(maxnk,2),
+     &              wpr1(maxnk,2), wpr2(maxnk,2), co1(maxnk,2), co2(maxnk,2),
+     &              co1a(maxnk), co2a(maxnk), h1(maxnk,2), h2(maxnk), ewpr1(maxnk,2),
+     &              ewpr2(maxnk,2), a0(maxnk), wpr0(maxnk), tw0(maxnk), hb(maxnk),
+     &              ahb(maxnk), wprhb(maxnk), twhb(maxnk), co1hb(maxnk), co2hb(maxnk),
      &              qlat(2), j, jp1, omega, qub, dt, dx, cmpd, dqbf,
-     &              width(20,2), alpha(20,2), thresh(20), p, wool, wco,
-     &              rf(20,2), qltr(20), afov(20), rwidth(20,2)
+     &              width(maxnk,2), alpha(maxnk,2), thresh(maxnk), p, wool, wco,
+     &              rf(maxnk,2), qltr(maxnk), afov(maxnk), rwidth(maxnk,2)
 
       integer,dimension(2) :: outq, latq, latr, nql
       real,dimension(5000) :: t, z, r
@@ -196,16 +197,16 @@ C** new chl
       real,dimension(2) :: dqu, qu, qu1, qu2, z1, z2, z3, qlat1, qlat2,
      &                     dthr, dqlat, zb, quba
 C
-      dimension  qt(20), topw(20,2), slope(20,2), rs(2,2), inflow(12), 
-     &           upq(10,2), qup(10,2), upr(10), ql(20,2), depth(20),
-     &           idup(10), idlat(2), afac(20), hr1(20,2), nq(10,2)
+      dimension  qt(maxnk), topw(maxnk,2), slope(maxnk,2), rs(2,2), inflow(12), 
+     &           upq(10,2), qup(10,2), upr(10), ql(maxnk,2), depth(maxnk),
+     &           idup(10), idlat(2), afac(maxnk), hr1(maxnk,2), nq(10,2)
      
       real, parameter :: dtmin = 1.0
 C                                                                   common data
 C------------------------------------------------------------------------------
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 
@@ -2509,6 +2510,7 @@ C------------------------------------------------------------------------------
 
 
       subroutine errhub (hub, ferr, dferr)
+      use k2dims
 
 
 C  Computes the residual and derivative of the depth hub in the uniform
@@ -2521,16 +2523,16 @@ C          computing the initial baseflow profile when width(1,1) ne width(nk,1)
 
       integer j, jp1
 
-      common /chan/ a1(20,2), a2(20,2), q1(20,2), q2(20,2), fav(20,2),
-     &              wpr1(20,2), wpr2(20,2), co1(20,2), co2(20,2),
+      common /chan/ a1(maxnk,2), a2(maxnk,2), q1(maxnk,2), q2(maxnk,2), fav(maxnk,2),
+     &              wpr1(maxnk,2), wpr2(maxnk,2), co1(maxnk,2), co2(maxnk,2),
 !     &              co1a(20), co2a(20), h1(20,2), h2(20), ewpr1(20),
 !     &              ewpr2(20), a0(20), wpr0(20), tw0(20), hb(20),
-     &              co1a(20), co2a(20), h1(20,2), h2(20), ewpr1(20,2),
-     &              ewpr2(20,2), a0(20), wpr0(20), tw0(20), hb(20),
-     &              ahb(20), wprhb(20), twhb(20), co1hb(20), co2hb(20),
+     &              co1a(maxnk), co2a(maxnk), h1(maxnk,2), h2(maxnk), ewpr1(maxnk,2),
+     &              ewpr2(maxnk,2), a0(maxnk), wpr0(maxnk), tw0(maxnk), hb(maxnk),
+     &              ahb(maxnk), wprhb(maxnk), twhb(maxnk), co1hb(maxnk), co2hb(maxnk),
      &              qlat(2), j, jp1, omega, qub, dt, dx, cmpd, dqbf,
-     &              width(20,2), alpha(20,2), thresh(20), p, wool, wco,
-     &              rf(20,2), qltr(20), afov(20), rwidth(20,2)
+     &              width(maxnk,2), alpha(maxnk,2), thresh(maxnk), p, wool, wco,
+     &              rf(maxnk,2), qltr(maxnk), afov(maxnk), rwidth(maxnk,2)
 
       if (.not. cmpd .or. hub .le. thresh(1)) then
 
@@ -2595,6 +2597,7 @@ C------------------------------------------------------------------------------
 
 
       subroutine errch2 (h2jp1, ferr, dferr)
+      use k2dims
 
 
 C  Computes the residual and derivative of the depth h2jp1 in a finite
@@ -2605,19 +2608,19 @@ C  difference of kinematic flow equation for a trapezoidal open channel.
 
       integer j, jp1
 
-      common /chan/ a1(20,2), a2(20,2), q1(20,2), q2(20,2), fav(20,2),
-     &              wpr1(20,2), wpr2(20,2), co1(20,2), co2(20,2),
+      common /chan/ a1(maxnk,2), a2(maxnk,2), q1(maxnk,2), q2(maxnk,2), fav(maxnk,2),
+     &              wpr1(maxnk,2), wpr2(maxnk,2), co1(maxnk,2), co2(maxnk,2),
 !     &              co1a(20), co2a(20), h1(20,2), h2(20), ewpr1(20),
 !     &              ewpr2(20), a0(20), wpr0(20), tw0(20), hb(20),
-     &              co1a(20), co2a(20), h1(20,2), h2(20), ewpr1(20,2),
-     &              ewpr2(20,2), a0(20), wpr0(20), tw0(20), hb(20),
-     &              ahb(20), wprhb(20), twhb(20), co1hb(20), co2hb(20),
+     &              co1a(maxnk), co2a(maxnk), h1(maxnk,2), h2(maxnk), ewpr1(maxnk,2),
+     &              ewpr2(maxnk,2), a0(maxnk), wpr0(maxnk), tw0(maxnk), hb(maxnk),
+     &              ahb(maxnk), wprhb(maxnk), twhb(maxnk), co1hb(maxnk), co2hb(maxnk),
      &              qlat(2), j, jp1, omega, qub, dt, dx, cmpd, dqbf,
-     &              width(20,2), alpha(20,2), thresh(20), p, wool, wco,
-     &              rf(20,2), qltr(20), afov(20), rwidth(20,2)
+     &              width(maxnk,2), alpha(maxnk,2), thresh(maxnk), p, wool, wco,
+     &              rf(maxnk,2), qltr(maxnk), afov(maxnk), rwidth(maxnk,2)
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 
@@ -2766,6 +2769,7 @@ C------------------------------------------------------------------------------
 
 
       subroutine errha (hza, ferr, dferr)
+      use k2dims
 
 C  Computes the residual and derivative for depth hza in an equation for flow
 C  in zone A of the solution space (main channel only).
@@ -2774,19 +2778,19 @@ C  in zone A of the solution space (main channel only).
 
       integer j, jp1
 ! ewpr
-      common /chan/ a1(20,2), a2(20,2), q1(20,2), q2(20,2), fav(20,2),
-     &              wpr1(20,2), wpr2(20,2), co1(20,2), co2(20,2),
+      common /chan/ a1(maxnk,2), a2(maxnk,2), q1(maxnk,2), q2(maxnk,2), fav(maxnk,2),
+     &              wpr1(maxnk,2), wpr2(maxnk,2), co1(maxnk,2), co2(maxnk,2),
 !     &              co1a(20), co2a(20), h1(20,2), h2(20), ewpr1(20),
 !     &              ewpr2(20), a0(20), wpr0(20), tw0(20), hb(20),
-     &              co1a(20), co2a(20), h1(20,2), h2(20), ewpr1(20,2),
-     &              ewpr2(20,2), a0(20), wpr0(20), tw0(20), hb(20),
-     &              ahb(20), wprhb(20), twhb(20), co1hb(20), co2hb(20),
+     &              co1a(maxnk), co2a(maxnk), h1(maxnk,2), h2(maxnk), ewpr1(maxnk,2),
+     &              ewpr2(maxnk,2), a0(maxnk), wpr0(maxnk), tw0(maxnk), hb(maxnk),
+     &              ahb(maxnk), wprhb(maxnk), twhb(maxnk), co1hb(maxnk), co2hb(maxnk),
      &              qlat(2), j, jp1, omega, qub, dt, dx, cmpd, dqbf,
-     &              width(20,2), alpha(20,2), thresh(20), p, wool, wco,
-     &              rf(20,2), qltr(20), afov(20), rwidth(20,2)
+     &              width(maxnk,2), alpha(maxnk,2), thresh(maxnk), p, wool, wco,
+     &              rf(maxnk,2), qltr(maxnk), afov(maxnk), rwidth(maxnk,2)
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 
@@ -2847,9 +2851,10 @@ C------------------------------------------------------------------------------
 
 
       function areaf (a0, h, tw0, co1)
+      use k2dims
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 
@@ -2878,9 +2883,10 @@ C------------------------------------------------------------------------------
 
 
       function cwprf (wp0, h, co2)
+      use k2dims
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 
@@ -2908,9 +2914,10 @@ C------------------------------------------------------------------------------
 
 
       function dwprf (h)
+      use k2dims
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 
@@ -2939,9 +2946,10 @@ C------------------------------------------------------------------------------
 
 
       function dadhf (tw0, h, co1)
+      use k2dims
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 
@@ -2970,9 +2978,10 @@ C------------------------------------------------------------------------------
 
 
       function dqdhf (al, wp, p, ar, h, dadh, co2)
+      use k2dims
 
-      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,20,2),
-     &             wp_tab(500,20,2), tw_tab(500,20,2), j_tab
+      COMMON /tab/ tabdat, n1, h_tab(500), a_tab(500,maxnk,2),
+     &             wp_tab(500,maxnk,2), tw_tab(500,maxnk,2), j_tab
 
       LOGICAL tabdat
 

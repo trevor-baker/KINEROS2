@@ -103,6 +103,7 @@ C------------------------------------------------------------------------------
 
       subroutine kinsed_wepp ( indx, dt, dte, ql, a2, q2, rf, 
      &                 	qup, time)
+      use k2dims
 
       use runpars
       use elpars
@@ -112,8 +113,8 @@ C------------------------------------------------------------------------------
 
       integer  indx, nx
       real dt, dte, rf, time
-      real, dimension(20) ::  a2, q2, wid, slp
-      real, dimension(20) :: ql
+      real, dimension(maxnk) ::  a2, q2, wid, slp
+      real, dimension(maxnk) :: ql
       real, dimension(10) :: qup
       integer, dimension(10) :: inflow
 
@@ -127,7 +128,7 @@ C       corresponding to each rill space)
 C  ar2- x-sectional area of flow in a rill,
 C       while a2-hydraulic depth of flow in the rill space 
 C  h2 - depth of flow at given time and given node    
-      real, dimension(20) :: qr2, ar2, h2, eros 
+      real, dimension(maxnk) :: qr2, ar2, h2, eros 
       integer :: ierr, i, im, j, jp, n, na, nup, nlat,tstp, redist
       integer, dimension(5):: excd
       integer,save :: nk, ilast, nu
@@ -140,11 +141,11 @@ C
      &              canopy, Kibadj, alpha, p, widthp 
       real,save,dimension(5) ::wso, dwso, dwsol, wsin, dwsup, dwsupl
       real,save,dimension(5) :: csub, pros, csub1, csub2, dcsub
-      real,save,dimension(20) :: depnet, slope, a1, q1, qil
-      real,save,dimension(5,20) :: cs, cl 
-      real,save,dimension(20):: cst, clt, erosp
+      real,save,dimension(maxnk) :: depnet, slope, a1, q1, qil
+      real,save,dimension(5,maxnk) :: cs, cl 
+      real,save,dimension(maxnk):: cst, clt, erosp
 	real cpt, cpmt
-	real,save,dimension(20) ::qr1, ar1, h1
+	real,save,dimension(maxnk) ::qr1, ar1, h1
       real, dimension(5):: Tci, cp, cpm
 C
       integer, save, dimension(5) :: outc

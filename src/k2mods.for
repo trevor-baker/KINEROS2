@@ -1,5 +1,10 @@
 C   modules for K2
       
+      module k2dims
+        integer, parameter :: maxnk = 41   ! max spatial nodes per plane/channel/pipe
+      end module k2dims
+C
+      
       module multip
         real :: rmks, rmn, rmcv, rmg, rmin, rmcoh, rmspl, rmwco, rmlen
         real :: rmn_chan, rmsat

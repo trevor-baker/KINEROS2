@@ -2,6 +2,7 @@ MODULE kinsed_def
 
   USE runpars
   USE elpars
+  USE k2dims
 
   IMPLICIT NONE
   PUBLIC
@@ -73,7 +74,7 @@ MODULE kinsed_def
 
       CHARACTER(LEN=*) :: msg
       INTEGER          :: nup,nlat,nx,inflow(12)
-      REAL             :: omeg,delx,qf,slp(20,nchan)
+      REAL             :: omeg,delx,qf,slp(maxnk,nchan)
 
       INTEGER :: ierr
       REAL    :: ki
@@ -101,7 +102,7 @@ MODULE kinsed_def
     SUBROUTINE kinsed(indx, dt, dte, ql, a2, q2, topw, rf, qup, qt, time)
 
       INTEGER :: indx
-      REAL    :: dt,dte,ql(20,2),a2(20,nchan),q2(20,nchan),topw(20,nchan),rf,qup(10,2),qt(20),time
+      REAL    :: dt,dte,ql(maxnk,2),a2(maxnk,nchan),q2(maxnk,nchan),topw(maxnk,nchan),rf,qup(10,2),qt(maxnk),time
 
       IF(sed_model == 1) THEN ! Smith
         CALL kinsed_smith(indx, dt, dte, ql, a2, q2, topw, rf, qup, qt, time)
@@ -131,7 +132,7 @@ MODULE kinsed_def
 
     SUBROUTINE sedbf(qup, a2, q2, topw)
 
-      REAL :: qup(10,2),a2(20,nchan),q2(20,nchan),topw(20,nchan)
+      REAL :: qup(10,2),a2(maxnk,nchan),q2(maxnk,nchan),topw(maxnk,nchan)
 
       IF(sed_model == 1) THEN ! Smith
         CALL sedbf_smith(qup, a2, q2, topw)

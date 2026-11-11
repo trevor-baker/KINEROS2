@@ -56,3 +56,12 @@ A node-count mismatch in either input file stops K2 with an error.
 
 - Water-balance residual: about 0.2% of rain on EX1 even with no dry-out (probably K2's storage estimate; unconfirmed). Larger losses (about 13% in one test) when a fixed `fav` dries the plane mid-step, because K2 clamps `h` at 0. Under review; the paper handles this on the H1D side (Eq. 4 flux cap) and via smaller dtp.
 - Rain files must be shifted per period (`k2_shift_rain()` in `R/k2_chain.R`).
+
+## Node-count limit (`maxnk`)
+
+- `maxnk = 41` is one parameter in `module k2dims` (top of `k2mods.for`). Every node-sized array (plane, channel, pipe, urban, `infilt_test`, all `kinsed*` models, `common /plane1/ /chan/ /tab/ /pipe1/ /vars/ /layr/`) is dimensioned with it; each program unit that uses it has `use k2dims`. To change the limit, edit that one line and rebuild.
+- Non-node 20s (msg lengths, `qup(10,2)`, `do j = 1, 15` for `qbal`) were left alone. `kinsed_rhem.for` was 30, now `maxnk`.
+- Stock `nk = max(15*L/CLEN, 5)` capped at 15 is unchanged. Only a plane gets the opt-in: if `k2_infil.in` exists, its line 1 overrides `nk` (must be 5..`maxnk`, else error). Channels, pipes and urban planes keep the cap of 15.
+- `-ffree-line-length-none` added to the build script (`kinsed.f90` lines got longer).
+- Bounds check: build once with `-fcheck=bounds -g` (same sources and flags, no `-static`/`-O1` needed). EX1, wg11 and a 400 m plane at nk = 15 and 41 ran clean.
+- Tests: EX1 and wg11 output byte-identical to the pre-change exe; coupled nk = 15 on a 400 m plane (CLEN = 100) identical; nk = 41 (fav = 0, 0.33 mm/min x 200 min, SL 0.0005) gives `out_q` = 0.0021999980 vs qr*L = 0.0022 m3/s.
