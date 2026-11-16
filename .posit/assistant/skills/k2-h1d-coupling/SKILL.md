@@ -17,4 +17,6 @@ Full details (build flags, source list, stdin order, file formats, verified test
 - K2 reads answers from stdin (`-s kin.fil` doesn't work); rain file must be re-zeroed per period (`k2_shift_rain()` in `R/k2_chain.R`).
 - `R/k2_chain.R`: `k2_chain(exe, par, rain, breaks, fav, workdir)` - `fav` a vector or `function(i, state)`.
 - Tests that write files: run in repo (e.g. `build/chain_work`) and delete afterwards; Fortran edits must keep CRLF (see `line-endings` skill; use perl/byte-safe edits, `sed -i` can convert the whole file).
+- `maxnk = 41` (`module k2dims` in `src/k2mods.for`) dimensions all node arrays; `k2_infil.in` line 1 overrides plane `nk` (5..maxnk) - opt-in, stock cap 15 otherwise (channels/pipes/urban stay 15). `x64/k2_h1d.exe` and `build/mod/` are gitignored; rebuild with `build/build_k2_h1d.sh`. Bounds-check build recipe in `build/BUILD_NOTES.md`.
+- `src/rain.for`: hyetograph times round to 0.1 min normally, but to 1e-6 min when `k2_infil.in` exists (coupled mode; collisions bumped by 1e-6). Allows sub-0.05-min periods. `k2_write_pre` writes times `%.8f`. Verified: EX1 without `k2_infil.in` identical to old exe; rain_vol = rain x L x dt for dt 1/60..1 min (2e-5 rel at 1/60, real*4 limit).
 - Gotcha: K2 clamps `h >= 0`, so imposed `fav` beyond available water loses mass (item on hold in `posit/task_backlog.md`).

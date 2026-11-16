@@ -57,7 +57,7 @@ C------------------------------------------------------------------------------
       use runpars
       use messagew
 
-      logical xy
+      logical xy, coupled
 
       integer m, n, i, j, k, ierr, filen, kr, krtemp, kk, kkp1,
      &        nrg, icase, k1, k2, k3, i1, i2, i3, ii, nd, ndi, indx,
@@ -186,6 +186,7 @@ C TEMP SNOW
 C TEMP SNOW
 
 
+        inquire (file = 'k2_infil.in', exist = coupled)
         t1 = -1.
         rlab = 'D'
 
@@ -211,8 +212,13 @@ C                                                                      get data
           if (k .gt. 2600000) stop ' error - too much rainfall data'
 C protective roundoff to nearest 0.1 min:
           ot2 = t2
-          nt2 = nint(ot2*10.)
-          t2 = real(nt2,4)/10.
+          if (coupled) then
+            t2 = real(dnint(dble(ot2)*1.d6)/1.d6, 4)
+            if (t2 .le. t1) t2 = t1 + 1.e-6
+          else
+            nt2 = nint(ot2*10.)
+            t2 = real(nt2,4)/10.
+          end if
 C          write(77,'(" t, round t:", 2f10.5)') ot2, t2
 C                                                                   time in sec
           ti(k) = t2 * 60.

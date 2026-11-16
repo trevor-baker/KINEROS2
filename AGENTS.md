@@ -1,6 +1,6 @@
 # Project Memory: KINEROS2
 
-**Last updated:** 2026-11-10 20:41 (K2 coupling Phases 0-2 done on branch `h1d-coupling`, uncommitted).
+**Last updated:** 2026-11-15 (coupled-mode fine rain-time rounding in `rain.for` landed + verified, uncommitted; exe rebuilt).
 
 **Reference material lives in skills** (`.posit/assistant/skills/`) and loads automatically when relevant — don't duplicate their content here. Create a new skill the first time a landed convention, script-architecture detail, or recurring gotcha is worth remembering (see "Where New Content Goes").
 - `session-protocol` — the `/savememory` mechanics (route content, update AGENTS.md, write session history) plus `task_backlog.md`'s pending-verification/bundling conventions.
@@ -41,14 +41,14 @@ If AGENTS.md exceeds ~100 lines, something was misrouted — find and move it.
 
 ## Where We Left Off — RESTART HERE
 
-K2 coupling edits (Phases 0-2) are done but **uncommitted** on branch `h1d-coupling` (plane.for, kinsed_wepp.for, R/, build/, x64/k2_h1d.exe). Item 6 water-balance leak is on hold by user. See NST 1-3.
+Nothing mid-thread. Coupling work and `maxnk` change are committed on `h1d-coupling`. Uncommitted: `src/rain.for` (coupled rounding) and `R/k2_chain.R` (`%.8f` times) - commit when user asks. `x64/k2_h1d.exe` and `build/mod/` are gitignored (local build only). IEGsoil-side exe guard prompt was handed to the user (see NST 1).
 
 ---
 
 ## Next Session Tasks (a.k.a. NST)
 *(Prompted when user asks "where to start?"; remove each item only after user confirms it is done. Pointers only — full detail: `posit/task_backlog.md`, matching numbers.)*
 
-1. Commit K2 coupling work on `h1d-coupling` (only when user says); decide track/ignore for `x64/k2_h1d.exe`, `build/mod/`.
+1. IEGsoil agent: add `hyd_k2BuildExe()` + `hyd_k2Exe()` guard (stop if exe missing, tell user to build); user running that prompt.
 2. Continue plan past Phase 2: R coupler `hyd_k2Couple()` + HYDRUS side (plan file in iegsoil_dev).
 3. Item 6 water-balance leak - ON HOLD per user; R-side Eq. 4 cap, compare smaller dtp later.
 4. Minor: bit-for-bit check vs `k2_x64.exe`; confirm source of baseline EX1 residual.

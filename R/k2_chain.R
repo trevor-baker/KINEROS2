@@ -23,7 +23,7 @@ k2_write_pre <- function(rain, path, gauge = "RG001") {
   lines <- c(
     paste("BEGIN", gauge), "", paste0("   N = ", nrow(rain)), "",
     "    TIME          DEPTH", "!   (min)         (mm)", "",
-    sprintf("%9.4f  %14.6f", rain$time, rain$depth), "", "END"
+    sprintf("%.8f  %.8f", rain$time, rain$depth), "", "END"
   )
   writeLines(lines, path, sep = "\n")
 }
