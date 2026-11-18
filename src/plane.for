@@ -122,6 +122,12 @@ C------------------------------------------------------------------------------
       logical :: up, unif, laminar
 C                                    coupled-mode (H1D-K2) hooks, see below
       logical, save :: coupled = .false., ext_inf = .false.
+      logical, save :: tight_ok = .true.
+      character(len=8) :: k2_env
+      integer :: k2_envlen, k2_envst
+      character(len=32) :: k2_tolc
+      integer :: k2_tollen, k2_tolst, k2_ios
+      real :: k2_tolv
       logical :: ex_st, ex_nk
       real, save :: fav_ext(maxnk)
       integer :: iu, nkf
@@ -762,6 +768,16 @@ C                                    optional coupled-mode input files.
 C                                    absent => stock behaviour (no change)
       inquire (file = 'k2_infil.in', exist = ext_inf)
       coupled = ext_inf
+C     env K2_ITER_STOCK=1 forces stock iter() tolerances even when coupled
+      call get_environment_variable ('K2_ITER_STOCK', k2_env, k2_envlen, k2_envst)
+      tight_ok = .not. (k2_envst .eq. 0 .and. trim(k2_env) .eq. '1')
+C     env K2_ITER_TOL=<real> sets the coupled tight tol (ignored if invalid or <= 0)
+      call get_environment_variable ('K2_ITER_TOL', k2_tolc, k2_tollen, k2_tolst)
+      iter_tol_user = 0.
+      if (k2_tolst .eq. 0) then
+        read (k2_tolc, *, iostat = k2_ios) k2_tolv
+        if (k2_ios .eq. 0 .and. k2_tolv .gt. 0.) iter_tol_user = k2_tolv
+      end if
       if (ext_inf) then
 C                       k2_infil.in: nk, then fav(1:nk) (m/s, constant/run)
         open (newunit = iu, file = 'k2_infil.in', status = 'old')
@@ -1055,7 +1071,9 @@ C                                                               microtopography
 
                 source = 'PLanUB'
 
+                iter_tight = coupled .and. tight_ok
                 call iter (erpaub, a2u, 0., h_lim, ierr, source)
+                iter_tight = .false.
 
                 if (ierr .gt. 0) call errxit
      &                           (msg(ms:14), 'no convergence (erpaub)')
@@ -1164,11 +1182,14 @@ C                                                iterative solution for h2(j+1)
 
               write(source,"('Plan',i2)") jp1
 
+              iter_tight = coupled .and. tight_ok
               call iter (errh2, h2jp1, 0., h_lim, ierr, source)
+              iter_tight = .false.
 
               if (ierr .gt. 0) then
                 if(diag) write(99,*) jp1, hmin,h2jp1,ql(j,1),ql(jp1,1)
                 close(99)
+                write (*,*) 'no convergence (errh2) tol=', iter_tol_used
                 call errxit(msg(ms:14), 'no convergence (errh2)')
               else if (j .eq. 2) then
                 itot = itot - ierr

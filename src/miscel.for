@@ -533,10 +533,21 @@ C
       subroutine iter (errfct, x, xmin, xmax, ierr, trace)
 C
 C
+      use k2dims, only: iter_tight, iter_tol_user, iter_tol_used
       integer i, ierr
       character(LEN=6) trace
 
       data tol, rtol /1.E-7,1.e-4/
+C                          coupled H1D-K2 mode (plane.for sets iter_tight): tight tolerances
+      if (iter_tight) then
+        tol  = 1.E-10
+        if (iter_tol_user .gt. 0.) tol = iter_tol_user
+        rtol = 1.e-8
+      else
+        tol  = 1.E-7
+        rtol = 1.e-4
+      end if
+      iter_tol_used = tol
 
       xlow = xmin
       xhigh = xmax

@@ -2,6 +2,9 @@ C   modules for K2
       
       module k2dims
         integer, parameter :: maxnk = 41   ! max spatial nodes per plane/channel/pipe
+        logical :: iter_tight = .false.  ! set by plane.for (coupled only): tight iter() tolerances
+        real :: iter_tol_user = 0.   ! K2_ITER_TOL (>0) overrides tight tol; 0 = unset
+        real :: iter_tol_used = 0.   ! tol in use by last iter() call (for messages)
       end module k2dims
 C
       
